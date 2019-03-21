@@ -8,20 +8,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import example.demoBank.entity.Customer;
-import example.demoBank.repository.CustomerRepository;
+import example.demoBank.service.implemented.CustomerService;
 
 @RestController
 public class CustomerController {
 	
-	private CustomerRepository customerRepository;
+	private CustomerService customerService;
 	
 	@Autowired
-	public CustomerController(CustomerRepository customerRepository){
-		this.customerRepository = customerRepository;
+	public CustomerController(CustomerService customerService){
+		this.customerService = customerService;
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/customers")
 	public List<Customer> getAllCustomers(){
-		return (List<Customer>) customerRepository.findAll();
+		return (List<Customer>) customerService.findAllCustomers();
 	}	
+	
+	public Customer getCustomerObject(Long ID) {
+		return customerService.findByID(ID);
+	}
 }

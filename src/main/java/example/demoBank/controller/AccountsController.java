@@ -15,22 +15,27 @@ import example.demoBank.entity.Customer;
 import example.demoBank.entity.NewAccount;
 import example.demoBank.repository.AccountsRepository;
 import example.demoBank.repository.CustomerRepository;
+import example.demoBank.service.implemented.AccountsService;
+import example.demoBank.service.implemented.CustomerService;
+import example.demoBank.service.implemented.TransactionsService;
 
 @RestController
 public class AccountsController {
 	
-	private AccountsRepository accountsRepository;
-	private CustomerRepository customerRepository;
+	private AccountsService accountsService;
+	private CustomerController customerController;
+	private TransactionsController transactionsController;
 	
 	@Autowired
-	public AccountsController(AccountsRepository accountsRepository, CustomerRepository customerRepository) {
-		this.accountsRepository = accountsRepository;
-		this.customerRepository = customerRepository;
+	public AccountsController(AccountsService accountsService, CustomerController customerController, TransactionsController transactionsController) {
+		this.accountsService = accountsService;
+		this.customerController = customerController;
+		this.transactionsController = transactionsController;
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/accounts")
 	public List<Accounts> getAllAccounts(){
-		return (List<Accounts>) accountsRepository.findAll();
+		return (List<Accounts>) accountsService.findAllAccounts();
 		}
 	@RequestMapping(method = RequestMethod.POST, value = "/accounts/new")
 	public void addAccount(@RequestBody NewAccount newAccount) {
@@ -39,13 +44,14 @@ public class AccountsController {
 		
 		account.setInitialCredit(newAccount.getInitialCredit());
 		account.setBalance(newAccount.getInitialCredit());
-		account.setCustomer(customerRepository.findById(newAccount.getCustomerID()).orElse(null));
+		account.setCustomer(customerController.getCustomerObject(newAccount.getCustomerID()));
 		
 		try {
-		accountsRepository.save(account);
+		accountsService.addAccount(account);
+		transactionsController.addFirstTransaction(accountsService.findLatestAccount());
+		
 		}
 		catch(Exception e) {
-			System.out.println("asshole");
 			e.printStackTrace();
 		}
 		
