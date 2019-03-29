@@ -54,7 +54,7 @@ public class CustomerService implements CustomerServiceUnimplemented{
 
 	@Override
 	public boolean exists(Customer customer) {
-		return customerRepository.existsById(customer.getCustomerID());
+		return customerRepository.existsById(customer.getId());
 	}
 
 }

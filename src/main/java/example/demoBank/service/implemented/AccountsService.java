@@ -1,67 +1,99 @@
 package example.demoBank.service.implemented;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import example.demoBank.entity.Accounts;
+import example.demoBank.dto.request.NewAccountRequest;
+import example.demoBank.entity.Account;
+import example.demoBank.entity.Customer;
+import example.demoBank.entity.Transaction;
+import example.demoBank.entity.TransactionType;
 import example.demoBank.repository.AccountsRepository;
 import example.demoBank.service.AccountsServiceUnimplemented;
 
 @Service
-public class AccountsService implements AccountsServiceUnimplemented{
+public class AccountsService {
 
 	
 	@Autowired
 	private AccountsRepository accountsRepository;
 	
-	@Override
+	@Autowired
+	private CustomerService customerService;
+	
+	@Autowired
+	private TransactionsService transactionService;
+	
+	
 	public long count() {
 		return accountsRepository.count();
 	}
 
-	@Override
+	
 	public void delete(long ID) {
 		accountsRepository.deleteById(ID);
 		
 	}
 
-	@Override
+	
 	public void deleteAll() {
 		accountsRepository.deleteAll();
 		
 	}
 
-	@Override
-	public Accounts addAccount(Accounts accounts) {
-		return accountsRepository.save(accounts);
+	
+	@Transactional
+	public void addAccount(NewAccountRequest newAccountRequest) {
+		// Unit test for this method
+		Account account = new Account();
+		Transaction transaction = new Transaction();
+		Customer customer = customerService.findByID(newAccountRequest.getCustomerID());
+		Date now = new Date();
+		
+		account.setInitialCredit(newAccountRequest.getInitialCredit());
+		account.setBalance(BigDecimal.valueOf(0));
+		account.setCreationDate(now);
+		account.setCustomer(customer);
+		accountsRepository.save(account);
+		
+		transaction.setAmmount(newAccountRequest.getInitialCredit());
+		transaction.setTransactionType(TransactionType.IN);
+		transaction.setTransactionDate(account.getCreationDate());
+		transaction.setAccount(accountsRepository.getAccountByTimeStampAndBalance(account.getCreationDate(), account.getBalance()));
+		transactionService.addTransaction(transaction);
+		
+		
 	}
 
-	@Override
-	public Accounts findByID(long ID) {
-		Optional<Accounts> account = accountsRepository.findById(ID);
+	
+	public Account findByID(long ID) {
+		Optional<Account> account = accountsRepository.findById(ID);
 		if(account.isPresent()) {
 			return account.get();
 		}
 		else return null;
 	}
-
-	@Override
-	public List<Accounts> findAllAccounts() {
-		return (List<Accounts>) accountsRepository.findAll();
+	
+	public List<Account> findAllAccounts() {
+		return (List<Account>) accountsRepository.findAll();
+	}
+	
+	public boolean exists(Account accounts) {
+		return accountsRepository.existsById(accounts.getId());
 	}
 
-	@Override
-	public boolean exists(Accounts accounts) {
-		return accountsRepository.existsById(accounts.getAccountID());
-	}
-
-	@Override
-	public Accounts findLatestAccount() {
-		List<Accounts> accounts = (List<Accounts>) accountsRepository.findAll();
-		return accounts.get(accounts.size()-1);
+	@Transactional
+	public void updateAccount(Transaction transactions) {
+		if(transactions.getTransactionType() == TransactionType.OUT)
+			accountsRepository.updateAccountReduceBalance(transactions.getAccount().getId(), transactions.getAccount().getCreationDate(), transactions.getAmmount());
+		else 
+			accountsRepository.updateAccountIncreaseBalance(transactions.getAccount().getId(), transactions.getAccount().getCreationDate(), transactions.getAmmount());
 	}
 
 }

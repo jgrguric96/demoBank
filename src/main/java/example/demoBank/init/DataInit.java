@@ -1,6 +1,7 @@
 package example.demoBank.init;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -10,9 +11,11 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import example.demoBank.entity.Accounts;
+import example.demoBank.dto.request.NewAccountRequest;
+import example.demoBank.entity.Account;
 import example.demoBank.entity.Customer;
-import example.demoBank.entity.Transactions;
+import example.demoBank.entity.Transaction;
+import example.demoBank.entity.TransactionType;
 import example.demoBank.repository.AccountsRepository;
 import example.demoBank.repository.CustomerRepository;
 import example.demoBank.service.implemented.AccountsService;
@@ -29,6 +32,9 @@ public class DataInit implements ApplicationRunner{
 	private CustomerService customerService;
 	private AccountsService accountsService;
 	private TransactionsService transactionsService;
+	
+	@Autowired
+	private NewAccountRequest newAccount;
 
 	
 	@Autowired
@@ -43,10 +49,10 @@ public class DataInit implements ApplicationRunner{
 		
 		if(customerService.count() == 0) {
 			Customer customer = new Customer();
-			Accounts account = new Accounts();
-			Transactions transaction = new Transactions();
+//			Account account = new Account();
+			Transaction transaction = new Transaction();
 			Random random = new Random();
-			int offset = 0;
+			Long value;
 			
 			List<String> firstNames = Arrays.asList(
 				"Marko","Kieran","Filip","Laura"
@@ -63,7 +69,7 @@ public class DataInit implements ApplicationRunner{
 			
 			for(int i = 0; i < firstNames.size();i++)
 			{
-				customer.setCustomerID(Integer.toUnsignedLong(i)+1);
+				customer.setId(Integer.toUnsignedLong(i)+1);
 				customer.setName(firstNames.get(i));
 				customer.setSurname(lastNames.get(i));
 				customerService.addCustomer(customer);
@@ -71,28 +77,20 @@ public class DataInit implements ApplicationRunner{
 			
 			for(int i = 0; i < 6; i++)
 			{
-				account.setAccountID(Integer.toUnsignedLong(i)+1);
-				account.setBalance(balance.get(i));
-				if(i%2==0) account.setInitialCredit(balance.get(i));
-				else account.setInitialCredit(balance.get(i).add(BigDecimal.valueOf(10000)));
-				account.setCustomer(customerService.findByID(random.nextInt(4)+1));
-				accountsService.addAccount(account);
+				value = Long.valueOf(random.nextInt(4)+1);
+				newAccount.setCustomerID(value);
+				newAccount.setInitialCredit(balance.get(i));
+				accountsService.addAccount(newAccount);
+				transaction.setId(null);
+				if(i%2 == 0) {
+					Date date = new Date();
+					transaction.setAmmount(BigDecimal.valueOf(10000));
+					transaction.setTransactionType(TransactionType.OUT);
+					transaction.setTransactionDate(date);
+					transaction.setAccount(accountsService.findByID(Long.valueOf(i+1)));
+					transactionsService.addTransaction(transaction);
+				}
 				
-				transaction.setTransactionID(Integer.toUnsignedLong(i)+1+offset);
-				transaction.setAccounts(accountsService.findByID(Integer.toUnsignedLong(i)+1));
-				if(i%2==0) {
-					transaction.setAmmount(balance.get(i));
-					transactionsService.addTransaction(transaction);
-				}
-				else {
-					++offset;
-					transaction.setAmmount(balance.get(i).add(BigDecimal.valueOf(10000)));
-					transactionsService.addTransaction(transaction);
-					transaction.setAmmount(BigDecimal.valueOf(-10000));
-					transaction.setTransactionID(Integer.toUnsignedLong(i)+1+offset);
-					transactionsService.addTransaction(transaction);
-					
-				}
 			}
 			
 		}

@@ -1,30 +1,33 @@
 package example.demoBank.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.OneToMany;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
-@Table(name="CUSTOMER")
-@Data
 public class Customer {
-	
-	@Id
-	@GeneratedValue(strategy= GenerationType.AUTO)
-	@Column(name="customerID")
-	private Long customerID;
-	
-	@Column(name="name")
-	private String name;
-	
-	@Column(name="surname")
-	private String surname;
 
+	@Id
+	@GeneratedValue
+	@Column
+	private Long id;
+
+	@Column
+	private String name;
+
+	@Column
+	private String surname;
+//
+//	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+//    private List<Account> accounts;
 }
