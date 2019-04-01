@@ -5,18 +5,22 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import example.demoBank.entity.Transactions;
+import example.demoBank.entity.Transaction;
+import example.demoBank.entity.TransactionType;
+import example.demoBank.service.IService;
 import example.demoBank.service.TransactionsServiceUnimplemented;
 import example.demoBank.repository.TransactionsRepository;
 
 
 @Service
-public class TransactionsService implements TransactionsServiceUnimplemented{
+public class TransactionsService implements IService<Transaction, Long>{
 
-	
 	@Autowired
 	private TransactionsRepository transactionsRepository;
+	@Autowired
+	private AccountsService accountService;
 	
 	@Override
 	public long count() {
@@ -35,28 +39,28 @@ public class TransactionsService implements TransactionsServiceUnimplemented{
 		
 	}
 
-	@Override
-	public Transactions addTransaction(Transactions transactions) {
-		return transactionsRepository.save(transactions);
+	public void addNewEntity(Transaction transaction) {
+		transactionsRepository.save(transaction);
+		accountService.updateAccount(transaction);
 	}
 
 	@Override
-	public Transactions findByID(long ID) {
-		Optional<Transactions> transactions = transactionsRepository.findById(ID);
-		if(transactions.isPresent()) 
-			return transactions.get();
+	public Transaction findByID(Long id) {
+		Optional<Transaction> transaction = transactionsRepository.findById(id);
+		if(transaction.isPresent()) 
+			return transaction.get();
 		else
 			return null;
 	}
 
 	@Override
-	public List<Transactions> findAllTransactions() {
-		return (List<Transactions>) transactionsRepository.findAll();
+	public List<Transaction> findAllEntities() {
+		return (List<Transaction>) transactionsRepository.findAll();
 	}
 
 	@Override
-	public boolean exists(Transactions transactions) {
-		return transactionsRepository.existsById(transactions.getTransactionID());
+	public boolean exists(Transaction transactions) {
+		return transactionsRepository.existsById(transactions.getId());
 	}
 
 }

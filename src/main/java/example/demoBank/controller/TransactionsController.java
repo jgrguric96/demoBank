@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import example.demoBank.entity.Accounts;
-import example.demoBank.entity.Transactions;
+import example.demoBank.entity.Account;
+import example.demoBank.entity.Transaction;
 import example.demoBank.service.implemented.TransactionsService;
 
 @RestController
@@ -22,17 +22,17 @@ public class TransactionsController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/transactions")
-	public List<Transactions> getAllTransactions(){
-		return (List<Transactions>) transactionsService.findAllTransactions();
+	public List<Transaction> getAllTransactions(){
+		return (List<Transaction>) transactionsService.findAllEntities();
 	}
 	
-	public void addFirstTransaction(Accounts account)
+	public void addFirstTransaction(Account account)
 	{
-		Transactions transaction = new Transactions();
+		Transaction transaction = new Transaction();
 		
 		transaction.setAmmount(account.getBalance());
-		transaction.setAccounts(account);
+		transaction.setAccount(account);
 		
-		transactionsService.addTransaction(transaction);
+		transactionsService.addNewEntity(transaction);
 	}
 }

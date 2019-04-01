@@ -22,10 +22,6 @@ public class CustomerController {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/customers")
 	public List<Customer> getAllCustomers(){
-		return (List<Customer>) customerService.findAllCustomers();
-	}	
-	
-	public Customer getCustomerObject(Long ID) {
-		return customerService.findByID(ID);
+		return customerService.findAllEntities();
 	}
 }
