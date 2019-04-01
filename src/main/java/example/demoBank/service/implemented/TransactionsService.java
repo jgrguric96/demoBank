@@ -9,14 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import example.demoBank.entity.Transaction;
 import example.demoBank.entity.TransactionType;
+import example.demoBank.service.IService;
 import example.demoBank.service.TransactionsServiceUnimplemented;
 import example.demoBank.repository.TransactionsRepository;
 
 
 @Service
-public class TransactionsService implements TransactionsServiceUnimplemented{
+public class TransactionsService implements IService<Transaction, Long>{
 
-	
 	@Autowired
 	private TransactionsRepository transactionsRepository;
 	@Autowired
@@ -39,23 +39,22 @@ public class TransactionsService implements TransactionsServiceUnimplemented{
 		
 	}
 
-	@Override
-	public void addTransaction(Transaction transactions) {
-		transactionsRepository.save(transactions);
-		accountService.updateAccount(transactions);
+	public void addNewEntity(Transaction transaction) {
+		transactionsRepository.save(transaction);
+		accountService.updateAccount(transaction);
 	}
 
 	@Override
-	public Transaction findByID(long ID) {
-		Optional<Transaction> transactions = transactionsRepository.findById(ID);
-		if(transactions.isPresent()) 
-			return transactions.get();
+	public Transaction findByID(Long id) {
+		Optional<Transaction> transaction = transactionsRepository.findById(id);
+		if(transaction.isPresent()) 
+			return transaction.get();
 		else
 			return null;
 	}
 
 	@Override
-	public List<Transaction> findAllTransactions() {
+	public List<Transaction> findAllEntities() {
 		return (List<Transaction>) transactionsRepository.findAll();
 	}
 

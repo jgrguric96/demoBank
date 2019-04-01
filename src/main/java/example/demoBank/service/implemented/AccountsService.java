@@ -15,12 +15,11 @@ import example.demoBank.entity.Customer;
 import example.demoBank.entity.Transaction;
 import example.demoBank.entity.TransactionType;
 import example.demoBank.repository.AccountsRepository;
-import example.demoBank.service.AccountsServiceUnimplemented;
+import example.demoBank.service.IService;
 
 @Service
-public class AccountsService {
+public class AccountsService implements IService<Account, Long>{
 
-	
 	@Autowired
 	private AccountsRepository accountsRepository;
 	
@@ -49,7 +48,7 @@ public class AccountsService {
 
 	
 	@Transactional
-	public void addAccount(NewAccountRequest newAccountRequest) {
+	public void addNewEntity(NewAccountRequest newAccountRequest) {
 		// Unit test for this method
 		Account account = new Account();
 		Transaction transaction = new Transaction();
@@ -66,13 +65,13 @@ public class AccountsService {
 		transaction.setTransactionType(TransactionType.IN);
 		transaction.setTransactionDate(account.getCreationDate());
 		transaction.setAccount(accountsRepository.getAccountByTimeStampAndBalance(account.getCreationDate(), account.getBalance()));
-		transactionService.addTransaction(transaction);
+		transactionService.addNewEntity(transaction);
 		
 		
 	}
 
 	
-	public Account findByID(long ID) {
+	public Account findByID(Long ID) {
 		Optional<Account> account = accountsRepository.findById(ID);
 		if(account.isPresent()) {
 			return account.get();
@@ -80,7 +79,7 @@ public class AccountsService {
 		else return null;
 	}
 	
-	public List<Account> findAllAccounts() {
+	public List<Account> findAllEntities() {
 		return (List<Account>) accountsRepository.findAll();
 	}
 	

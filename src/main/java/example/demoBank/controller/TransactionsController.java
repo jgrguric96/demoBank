@@ -23,7 +23,7 @@ public class TransactionsController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/transactions")
 	public List<Transaction> getAllTransactions(){
-		return (List<Transaction>) transactionsService.findAllTransactions();
+		return (List<Transaction>) transactionsService.findAllEntities();
 	}
 	
 	public void addFirstTransaction(Account account)
@@ -33,6 +33,6 @@ public class TransactionsController {
 		transaction.setAmmount(account.getBalance());
 		transaction.setAccount(account);
 		
-		transactionsService.addTransaction(transaction);
+		transactionsService.addNewEntity(transaction);
 	}
 }

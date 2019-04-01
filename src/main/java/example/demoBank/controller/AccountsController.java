@@ -37,14 +37,14 @@ public class AccountsController {
 
 	@RequestMapping(method = RequestMethod.GET, value = "/accounts")
 	public List<Account> getAllAccounts() {
-		return (List<Account>) accountsService.findAllAccounts();
+		return (List<Account>) accountsService.findAllEntities();
 	}
 
 //	@RequestMapping(method = RequestMethod.POST, value = "/accounts/new")
 	@PostMapping("accounts/new")
 	public void addAccount(@RequestBody NewAccountRequest newAccountRequest) {
 		// Write integration test for this layer
-		accountsService.addAccount(newAccountRequest);
+		accountsService.addNewEntity(newAccountRequest);
 	}
 
 }

@@ -72,7 +72,7 @@ public class DataInit implements ApplicationRunner{
 				customer.setId(Integer.toUnsignedLong(i)+1);
 				customer.setName(firstNames.get(i));
 				customer.setSurname(lastNames.get(i));
-				customerService.addCustomer(customer);
+				customerService.addNewEntity(customer);
 			}
 			
 			for(int i = 0; i < 6; i++)
@@ -80,7 +80,7 @@ public class DataInit implements ApplicationRunner{
 				value = Long.valueOf(random.nextInt(4)+1);
 				newAccount.setCustomerID(value);
 				newAccount.setInitialCredit(balance.get(i));
-				accountsService.addAccount(newAccount);
+				accountsService.addNewEntity(newAccount);
 				transaction.setId(null);
 				if(i%2 == 0) {
 					Date date = new Date();
@@ -88,7 +88,7 @@ public class DataInit implements ApplicationRunner{
 					transaction.setTransactionType(TransactionType.OUT);
 					transaction.setTransactionDate(date);
 					transaction.setAccount(accountsService.findByID(Long.valueOf(i+1)));
-					transactionsService.addTransaction(transaction);
+					transactionsService.addNewEntity(transaction);
 				}
 				
 			}

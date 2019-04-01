@@ -9,10 +9,11 @@ import org.springframework.stereotype.Service;
 import example.demoBank.entity.Customer;
 import example.demoBank.repository.CustomerRepository;
 import example.demoBank.service.CustomerServiceUnimplemented;
+import example.demoBank.service.IService;
 
 
 @Service
-public class CustomerService implements CustomerServiceUnimplemented{
+public class CustomerService implements IService<Customer, Long>{
 	
 	@Autowired
 	private CustomerRepository customerRepository;
@@ -33,13 +34,12 @@ public class CustomerService implements CustomerServiceUnimplemented{
 		customerRepository.deleteAll();
 	}
 
-	@Override
-	public Customer addCustomer(Customer customer) {
-		return customerRepository.save(customer);
+	public void addNewEntity(Customer customer) {
+		customerRepository.save(customer);
 	}
 
 	@Override
-	public Customer findByID(long ID) {
+	public Customer findByID(Long ID) {
 		Optional<Customer> customer = customerRepository.findById(ID);
 		if(customer.isPresent()) {
 			return customer.get();
@@ -48,7 +48,7 @@ public class CustomerService implements CustomerServiceUnimplemented{
 	}
 
 	@Override
-	public List<Customer> findAllCustomers() {
+	public List<Customer> findAllEntities() {
 		return (List<Customer>) customerRepository.findAll();
 	}
 

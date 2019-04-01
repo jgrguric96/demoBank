@@ -22,6 +22,6 @@ public class CustomerController {
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/customers")
 	public List<Customer> getAllCustomers(){
-		return customerService.findAllCustomers();
+		return customerService.findAllEntities();
 	}
 }
